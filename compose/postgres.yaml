@@ -1,0 +1,27 @@
+services:
+  # psql "host=postgres.resource.bsws.in port=5432 user=postgres dbname=postgres sslmode=require password=postgres"
+  postgres:
+    image: postgres:18-alpine
+    restart: unless-stopped # on-failure:3 / no / always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
+    networks:
+      - dokploy-network
+    volumes:
+      - ./postgres_data:/var/lib/postgresql/data
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=dokploy-network"
+      - "traefik.tcp.routers.pg-router.rule=HostSNI(`your-lovely.domain.tld`)"
+      - "traefik.tcp.routers.pg-router.entrypoints=postgres"
+      - "traefik.tcp.routers.pg-router.tls=true"
+      - "traefik.tcp.routers.pg-router.tls.certresolver=letsencrypt"
+      - "traefik.tcp.routers.pg-router.tls.options=postgres@file"
+      - "traefik.tcp.services.pg-service.loadbalancer.server.port=5432"
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "postgres"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
