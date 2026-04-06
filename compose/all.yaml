@@ -1,0 +1,96 @@
+services:
+  # psql "host=postgres.resource.bsws.in port=5432 user=postgres dbname=postgres sslmode=require password=postgres"
+  postgres:
+    image: postgres:18-alpine
+    restart: unless-stopped # on-failure:3 / no / always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
+    networks:
+      - dokploy-network
+    volumes:
+      - ./postgres_data:/var/lib/postgresql/data
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=dokploy-network"
+      - "traefik.tcp.routers.pg-router.rule=HostSNI(`postgres.resource.bsws.in`)"
+      - "traefik.tcp.routers.pg-router.entrypoints=postgres"
+      - "traefik.tcp.routers.pg-router.tls=true"
+      - "traefik.tcp.routers.pg-router.tls.certresolver=letsencrypt"
+      - "traefik.tcp.routers.pg-router.tls.options=postgres@file"
+      - "traefik.tcp.services.pg-service.loadbalancer.server.port=5432"
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "postgres"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+
+  # redis-cli --tls -h redis.resource.bsws.in --sni redis.resource.bsws.in
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped # on-failure:3 / no / always
+    networks:
+      - dokploy-network
+    volumes:
+      - redis_data:/data
+    labels:
+      - "traefik.enable=true"
+      - "traefik.enable=true"
+      - "traefik.docker.network=dokploy-network"
+      - "traefik.tcp.routers.redis-router.rule=HostSNI(`redis.resource.bsws.in`)"
+      - "traefik.tcp.routers.redis-router.entrypoints=redis"
+      - "traefik.tcp.routers.redis-router.tls=true"
+      - "traefik.tcp.routers.redis-router.tls.certresolver=letsencrypt"
+      - "traefik.tcp.routers.redis-router.tls.options=redis@file"
+      - "traefik.tcp.services.redis-service.loadbalancer.server.port=6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+  # mongosh "mongodb://admin:your_secure_password@mongodb.resource.bsws.in:27017/?tls=true"
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb
+    restart: always
+    networks:
+      - dokploy-network
+    volumes:
+      - mongodb_data:/data/db
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: your_secure_password
+    ulimits:
+      nproc: 65535
+      nofile:
+        soft: 65535
+        hard: 65535
+    labels:
+      - "traefik.enable=true"
+      # TCP Router for MongoDB
+      - "traefik.tcp.routers.mongodb.rule=HostSNI(`mongodb.resource.bsws.in`)"
+      - "traefik.tcp.routers.mongodb.entrypoints=mongodb"
+      - "traefik.tcp.routers.mongodb.tls=true"
+      - "traefik.tcp.routers.mongodb.tls.certresolver=letsencrypt"
+      - "traefik.tcp.routers.mongodb.service=mongodb"
+      - "traefik.tcp.routers.redis-router.tls.options=mongo@file"
+      - "traefik.tcp.services.mongodb.loadbalancer.server.port=27017"
+    healthcheck:
+      test: >
+        mongosh --quiet --username $$MONGO_INITDB_ROOT_USERNAME 
+        --password $$MONGO_INITDB_ROOT_PASSWORD --authenticationDatabase admin 
+        --eval 'db.runCommand({ping:1}).ok' | grep 1
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+
+volumes:
+  postgres_data:
+  redis_data:
+  mongodb_data:
+        
+networks:
+  dokploy-network:
+    external: true
