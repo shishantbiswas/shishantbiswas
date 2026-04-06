@@ -69,13 +69,13 @@ services:
     labels:
       - "traefik.enable=true"
       # TCP Router for MongoDB
-      - "traefik.tcp.routers.mongodb.rule=HostSNI(`mongodb.resource.bsws.in`)"
-      - "traefik.tcp.routers.mongodb.entrypoints=mongodb"
-      - "traefik.tcp.routers.mongodb.tls=true"
-      - "traefik.tcp.routers.mongodb.tls.certresolver=letsencrypt"
-      - "traefik.tcp.routers.mongodb.service=mongodb"
+      - "traefik.tcp.routers.mongo.rule=HostSNI(`mongo.resource.bsws.in`)"
+      - "traefik.tcp.routers.mongo.entrypoints=mongo"
+      - "traefik.tcp.routers.mongo.tls=true"
+      - "traefik.tcp.routers.mongo.tls.certresolver=letsencrypt"
+      - "traefik.tcp.routers.mongo.service=mongo"
       - "traefik.tcp.routers.redis-router.tls.options=mongo@file"
-      - "traefik.tcp.services.mongodb.loadbalancer.server.port=27017"
+      - "traefik.tcp.services.mongo.loadbalancer.server.port=27017"
     healthcheck:
       test: >
         mongosh --quiet --username $$MONGO_INITDB_ROOT_USERNAME 
