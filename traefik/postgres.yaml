@@ -1,0 +1,9 @@
+tls:
+  options:
+    postgres:
+      alpnProtocols:
+        - postgresql
+        - h2
+        - http/1.1
+      minVersion: VersionTLS12
+
