@@ -1,1 +1,1 @@
-Hi, If you'r reading this your probably on the wrong repository check again
+Hi, If you'r reading this your probably on the wrong profile check again
