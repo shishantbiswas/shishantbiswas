@@ -1,0 +1,42 @@
+ # mongosh "mongodb://admin:your_secure_password@your-lovely.domain.tld:27017/?tls=true"
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb
+    restart: always
+    networks:
+      - dokploy-network
+    volumes:
+      - mongodb_data:/data/db
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: your_secure_password
+    ulimits:
+      nproc: 65535
+      nofile:
+        soft: 65535
+        hard: 65535
+    labels:
+      - "traefik.enable=true"
+      # TCP Router for MongoDB
+      - "traefik.tcp.routers.mongodb.rule=HostSNI(`your-lovely.domain.tld`)"
+      - "traefik.tcp.routers.mongodb.entrypoints=mongodb"
+      - "traefik.tcp.routers.mongodb.tls=true"
+      - "traefik.tcp.routers.mongodb.tls.certresolver=letsencrypt"
+      - "traefik.tcp.routers.mongodb.service=mongodb"
+      - "traefik.tcp.services.mongodb.loadbalancer.server.port=27017"
+    healthcheck:
+      test: >
+        mongosh --quiet --username $$MONGO_INITDB_ROOT_USERNAME 
+        --password $$MONGO_INITDB_ROOT_PASSWORD --authenticationDatabase admin 
+        --eval 'db.runCommand({ping:1}).ok' | grep 1
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+
+volumes:
+  mongodb_data:
+        
+networks:
+  dokploy-network:
+    external: true
