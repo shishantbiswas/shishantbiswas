@@ -25,7 +25,7 @@ entryPoints:
     address: :5432
   redis:
     address: :6379
-  mongodb:
+  mongo:
     address: :27017
 api:
   insecure: true
