@@ -1,0 +1,23 @@
+# redis-cli --tls -h your-lovely.domain.tld --sni your-lovely.domain.tld
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped # on-failure:3 / no / always
+    networks:
+      - dokploy-network
+    volumes:
+      - redis_data:/data
+    labels:
+      - "traefik.enable=true"
+      - "traefik.enable=true"
+      - "traefik.docker.network=dokploy-network"
+      - "traefik.tcp.routers.redis-router.rule=HostSNI(`your-lovely.domain.tld`)"
+      - "traefik.tcp.routers.redis-router.entrypoints=redis"
+      - "traefik.tcp.routers.redis-router.tls=true"
+      - "traefik.tcp.routers.redis-router.tls.certresolver=letsencrypt"
+      - "traefik.tcp.routers.redis-router.tls.options=redis@file"
+      - "traefik.tcp.services.redis-service.loadbalancer.server.port=6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
