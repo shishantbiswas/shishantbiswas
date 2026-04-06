@@ -23,6 +23,7 @@
       - "traefik.tcp.routers.mongodb.tls=true"
       - "traefik.tcp.routers.mongodb.tls.certresolver=letsencrypt"
       - "traefik.tcp.routers.mongodb.service=mongodb"
+      - "traefik.tcp.routers.redis-router.tls.options=mongo@file"
       - "traefik.tcp.services.mongodb.loadbalancer.server.port=27017"
     healthcheck:
       test: >
