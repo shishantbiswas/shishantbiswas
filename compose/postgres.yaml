@@ -1,5 +1,5 @@
 services:
-  # psql "host=postgres.resource.bsws.in port=5432 user=postgres dbname=postgres sslmode=require password=postgres"
+  # psql "host=your-lovely.domain.tld port=5432 user=postgres dbname=postgres sslmode=require password=postgres"
   postgres:
     image: postgres:18-alpine
     restart: unless-stopped # on-failure:3 / no / always
