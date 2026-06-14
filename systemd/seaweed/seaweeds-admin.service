@@ -1,0 +1,20 @@
+# /etc/systemd/system/seaweedfs-admin.service 
+[Unit]
+Description=SeaweedFS Admin Web UI
+After=seaweedfs.service
+
+[Service]
+Type=simple
+User=seaweedfs
+Group=seaweedfs
+EnvironmentFile=/etc/seaweedfs/seaweedfs.env
+ExecStart=/usr/local/bin/weed admin \
+    -master=localhost:9333 \
+    -adminUser=${SEAWEED_USER_ADMIN} \
+    -adminPassword=${SEAWEED_PASSWORD_ADMIN} \
+    -port=23646 \
+    -dataDir=/var/lib/seaweedfs/admin-data
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
