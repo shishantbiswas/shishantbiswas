@@ -1,0 +1,20 @@
+# cat /etc/systemd/system/seaweedfs.service 
+[Unit]
+Description=SeaweedFS Server
+After=network.target
+
+[Service]
+Type=simple
+User=seaweedfs
+Group=seaweedfs
+EnvironmentFile=/etc/seaweedfs/seaweedfs.env
+ExecStart=/usr/local/bin/weed server \
+    -dir=/var/lib/seaweedfs/data \
+    -master.port=9333 \
+    -s3 \
+    -s3.port=8333 \
+    -s3.config=/etc/seaweedfs/s3.json
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
