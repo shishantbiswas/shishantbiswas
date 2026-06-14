@@ -1,0 +1,28 @@
+# cat /etc/systemd/system/minio.service 
+[Unit]
+Description=MinIO High Performance Object Storage
+Documentation=https://github.com/pgsty/minio
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=simple
+User=root
+Group=root
+WorkingDirectory=/usr/local/bin
+EnvironmentFile=/etc/default/minio
+ExecStart=/usr/local/bin/minio server $MINIO_OPTS $MINIO_VOLUMES
+Restart=always
+RestartSec=5
+
+# Resource Management (Replacing Docker limits)
+# Note: 640M memory limit from your compose
+MemoryMax=640M
+CPUWeight=60
+
+# File descriptor limits for high-performance S3
+LimitNOFILE=65536
+TasksMax=infinity
+
+[Install]
+WantedBy=multi-user.target
