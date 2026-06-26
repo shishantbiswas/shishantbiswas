@@ -1,4 +1,0 @@
-tls:
-  options:
-    redis:
-      minVersion: VersionTLS12
