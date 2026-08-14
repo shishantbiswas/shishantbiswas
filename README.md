@@ -1,12 +1,9 @@
 # Hi, I'm Shishant Biswas
 
-A self-taught developer focused on JavaScript/TypeScript ecosystem and low-level systems programming (C, C3). 
+A self-taught developer focused on JavaScript/TypeScript ecosystem and low-level systems programming. 
 
 ## Core Skills
-- **Frontend/Fullstack:** React, Next.js, Nuxt, TanStack Start, Qwik
-- **Backend/Runtime:** Node.js, Bun
-- **Systems:** C, C3, Java
+- **Frontend/Fullstack:** React, Solid, Tailwindcss
+- **Backend/Runtime:** Node.js, Bun, Deno
+- **Systems:** Go, Rust
 
-## Notable Work
-- **bknd:** Built framework adapters (Nuxt, TanStack Start, Agnostic) and documentation.
-- **ceb:** A custom web server written in C3.
